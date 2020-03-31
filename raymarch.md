@@ -1,7 +1,7 @@
 notes based on articles by [Jamie Wang](http://jamie-wong.com/) and [Inigo Quilez](http://iquilezles.org/)
 
-###  Simple Marching, Distance only
-Ray setup
+##  Marching
+We need: a ray util + an sdf function map(p) and any point p.
 ```
 // (dist , material) <- ray oritation, direction 
 vec2 castRay(vec3 ro, vec3 rd) {
@@ -22,7 +22,7 @@ vec2 castRay(vec3 ro, vec3 rd) {
     return vec2(-1.0, -1.0);
 }
 ```
-Standard sdf functions : [iq](http://iquilezles.org/www/articles/distfunctions/distfunctions.htm)
+[Standard sdf functions](http://iquilezles.org/www/articles/distfunctions/distfunctions.htm)
 
 Define sdf on model origin, inverse translation on point p for world position.
 ```
@@ -30,20 +30,31 @@ Define sdf on model origin, inverse translation on point p for world position.
 vec2 map(vec3 p) {
     vec2 res = (RAY_EPSILON*0.1, -1.0);
     for all object with sdf s, material m {
-        res = (res.x < s) ? res : vec2(s,m);
+        res = (res.x < s) ? res : vec2(s,m);  // union sdf
     }
     return res;
 }
 ```
+#### Camera
 
-### Shadertoy Utils
-```
-// ray origin, tangent, 
-mat3 setCamera( in vec3 ro, in vec3 ta, float cr ){
-    vec3 cw = normalize(ta-ro);
-    vec3 cp = vec3(sin(cr), cos(cr),0.0);
-    vec3 cu = normalize( cross(cw,cp) );
-    vec3 cv = cross(cu,cw);
-    return mat3( cu, cv, cw );
-}
-```
+Define the camera on a shpere's tangent plane. Camera_to_world mat can be calculated given ray orientation and camera position. Changing basis on tangent plane for tilt. image z-dist gives angle.
+
+## Render
+
+### Surface Normal
+
+#### Sdf Gradients
+
+Partial derivatices on sdf. Central difference require 6 DEs; Forward difference need 3.
+
+#### Tetrahedron
+
+Derived [here](http://iquilezles.org/www/articles/normalsSDF/normalsSDF.htm). In short, using Tetrahedron we only need 4 sdfs for 
+
+### Lightning
+
+Same BSDF
+
+### Shadow
+
+Marching shadow ray from pos to light. Min angle gives soft shadow range.
